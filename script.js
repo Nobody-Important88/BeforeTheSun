@@ -27,7 +27,6 @@ const lightswitchEl = document.getElementById('lightswitch')
 const lightGameAreaEl = document.getElementById('lightGameArea')
 const rulesCloseBtn = document.createElement('button')
 
-// ── PLAYER DIRECTION IMAGE ──
 const playerImg = player.querySelector('img')
 
 let gameLight = 'green'
@@ -49,7 +48,7 @@ let running       = false
 let view          = false
 let noclip        = false
 let lightOn       = false
-let debug         = true
+let debug         = false
 const walls       = []
 let mouseX        = 0
 let mouseY        = 0
@@ -66,8 +65,8 @@ const resetPanelEl = document.getElementById('resetPanel')
 
 function nearResetPanel() {
     return (
-        x < RESET_PANEL_WORLD.x + 120 && x + 50 > RESET_PANEL_WORLD.x - 20 &&
-        y < RESET_PANEL_WORLD.y + 80  && y + 50 > RESET_PANEL_WORLD.y - 20
+        x < RESET_PANEL_WORLD.x + 120 && x + 32 > RESET_PANEL_WORLD.x - 20 &&
+        y < RESET_PANEL_WORLD.y + 80  && y + 32 > RESET_PANEL_WORLD.y - 20
     )
 }
 
@@ -271,8 +270,8 @@ const toggleDoors = TOGGLE_DOOR_DEFS.map(def => {
 function nearToggleDoor() {
     const REACH = 60
     return toggleDoors.find(td =>
-        x < td.x + td.w + REACH && x + 50 > td.x - REACH &&
-        y < td.y + td.h + REACH && y + 50 > td.y - REACH
+        x < td.x + td.w + REACH && x + 32 > td.x - REACH &&
+        y < td.y + td.h + REACH && y + 32 > td.y - REACH
     ) || null
 }
 
@@ -503,8 +502,8 @@ document.querySelectorAll('.codeBox').forEach((box, index, arr) => {
 function nearComboDoor() {
     const REACH = 80
     return (
-        x + 50 > combodorX - REACH && x < combodorX + combodorW + REACH &&
-        y + 50 > combodorY - REACH && y < combodorY + combodorH + REACH
+        x + 32 > combodorX - REACH && x < combodorX + combodorW + REACH &&
+        y + 32 > combodorY - REACH && y < combodorY + combodorH + REACH
     )
 }
 function openComboMenu() {
@@ -562,12 +561,12 @@ function inZone(zone) {
     return x+25 > zone.x && x+25 < zone.x+zone.w && y+25 > zone.y && y+25 < zone.y+zone.h
 }
 function inLightZone() {
-    return x+50 > lightGameArea.x && x < lightGameArea.x+lightGameArea.w &&
-           y+50 > lightGameArea.y && y < lightGameArea.y+lightGameArea.h
+    return x+32 > lightGameArea.x && x < lightGameArea.x+lightGameArea.w &&
+           y+32 > lightGameArea.y && y < lightGameArea.y+lightGameArea.h
 }
 function inPurpleBottomZone() {
-    return x+50 > purpleBottomZone.x && x < purpleBottomZone.x+purpleBottomZone.w &&
-           y+50 > purpleBottomZone.y && y < purpleBottomZone.y+purpleBottomZone.h
+    return x+32 > purpleBottomZone.x && x < purpleBottomZone.x+purpleBottomZone.w &&
+           y+32 > purpleBottomZone.y && y < purpleBottomZone.y+purpleBottomZone.h
 }
 
 let prevX = x, prevY = y
@@ -649,7 +648,7 @@ function useMasterDoorKey() {
 }
 function nearMasterDoor() {
     if (masterDoorUnlocked) return false
-    return x < 2700+600 && x+50 > 2700-20 && y < 1785+60 && y+50 > 1785-20
+    return x < 2700+600 && x+32 > 2700-20 && y < 1785+60 && y+32 > 1785-20
 }
 
 function nearMachine() {
@@ -659,7 +658,7 @@ function nearMachine() {
     for (let p of puzzles) {
         let px = purpleZone.x + p.el.offsetLeft
         let py = purpleZone.y + p.el.offsetTop
-        if (x < px+110 && x+50 > px && y < py+110 && y+50 > py) return p.id
+        if (x < px+110 && x+32 > px && y < py+110 && y+32 > py) return p.id
     }
     return null
 }
@@ -788,8 +787,8 @@ ROOM_RULES.forEach(rule => {
 function nearRulesSign() {
     const REACH = 80
     return ruleSigns.find(s =>
-        x+50 > s.wx-REACH && x < s.wx+30+REACH &&
-        y+50 > s.wy-REACH && y < s.wy+100+REACH
+        x+32 > s.wx-REACH && x < s.wx+30+REACH &&
+        y+32 > s.wy-REACH && y < s.wy+100+REACH
     ) || null
 }
 
@@ -864,7 +863,7 @@ function checkWordPuzzleProximity() {
         const ww = wp.el.offsetWidth
         const wh = wp.el.offsetHeight
         const REACH = 50
-        if (x+50 > wx-REACH && x < wx+ww+REACH && y+50 > wy-REACH && y < wy+wh+REACH) {
+        if (x+32 > wx-REACH && x < wx+ww+REACH && y+32 > wy-REACH && y < wy+wh+REACH) {
             found = wp; break
         }
     }
@@ -877,11 +876,6 @@ document.addEventListener('keydown', e => {
     keys[e.key] = true
     keys[e.key.toLowerCase()] = true
 
-    if (e.key.toLowerCase() === 'm') view = !view
-    if (e.key.toLowerCase() === 'h') noclip = !noclip
-    if (e.key.toLowerCase() === 'g') debug = !debug
-    if (e.key.toLowerCase() === 't') { x = mouseX; y = mouseY }
-    if (e.key.toLowerCase() === 'p') forceend()
     if (e.key === 'x') { if (inventory['light'] > 0) lightOn = !lightOn }
 
     if (e.key.toLowerCase() === 'q') {
@@ -903,15 +897,12 @@ document.addEventListener('keydown', e => {
         }
     }
 
-    if (e.key.toLowerCase() === 'v') { if (currentPuzzle) instantSolvePuzzle(currentPuzzle) }
-    if (e.key.toLowerCase() === 'k') { if (wordWindow.style.display === 'flex') instantSolveWordPuzzle() }
-
     if (e.key === ' ') {
         if (uiOpen) return
 
         const winEl = document.getElementById('win')
         const winX = 2850, winY = 200, winW = 300, winH = 500
-        if (x + 50 > winX && x < winX + winW && y + 50 > winY && y < winY + winH) {
+        if (x + 32 > winX && x < winX + winW && y + 32 > winY && y < winY + winH) {
             running = false
             document.getElementById('winScreen').style.display = 'flex'
             return
@@ -977,7 +968,7 @@ document.addEventListener('keydown', e => {
         if (inLightZone() && gameLight === 'green') {
             colorItems.forEach(ci => {
                 if (ci.picked || colorHolding) return
-                if (x < ci.wx+80 && x+50 > ci.wx && y < ci.wy+80 && y+50 > ci.wy) {
+                if (x < ci.wx+80 && x+32 > ci.wx && y < ci.wy+80 && y+32 > ci.wy) {
                     ci.picked = true; colorHolding = ci.type
                     ci.el.style.display = 'none'; updateColorInventoryUI()
                 }
@@ -988,7 +979,7 @@ document.addEventListener('keydown', e => {
             colorBoxes.forEach((box, i) => {
                 if (box.filled) return
                 const bpos = boxworldposi[i]
-                if (x < bpos.x+100 && x+50 > bpos.x && y < bpos.y+100 && y+50 > bpos.y) {
+                if (x < bpos.x+100 && x+32 > bpos.x && y < bpos.y+100 && y+32 > bpos.y) {
                     box.filled = true
                     box.el.textContent = colorHolding.toUpperCase()
                     box.el.style.background = colorHolding === 'yellow' ? '#cccc00' : colorHolding
@@ -1124,25 +1115,6 @@ function removeWordPuzzleWall(puzzle) {
     }
 }
 
-function instantSolveWordPuzzle() {
-    if (!currentWordPuzzle) return
-    const puzzle = currentWordPuzzle
-    currentWordIndex = puzzle.words.length
-    puzzle.solved = true
-    wordThemeEl.textContent = 'DONE'
-    scrambledEl.textContent = ''
-    wordProgress.textContent = ''
-    wordResult.textContent = ''
-    wordComplete.textContent = 'PUZZLE COMPLETE'
-    puzzle.el.style.background = 'green'
-    puzzle.el.style.borderColor = 'lime'
-    removeWordPuzzleWall(puzzle)
-    wordWindow.style.display = 'none'
-    uiOpen = false
-    currentWordPuzzle = null
-    clearKeys()
-}
-
 function openWordPuzzle(puzzle) {
     uiOpen = true
     currentWordPuzzle = puzzle
@@ -1190,7 +1162,7 @@ function submitWord() {
 
 document.getElementById('wordSubmit').onclick = submitWord
 document.addEventListener('keydown', e => {
-    if (uiOpen && e.key !== 'Escape' && e.key.toLowerCase() !== 'k') return
+    if (uiOpen && e.key !== 'Escape') return
     if (e.key === 'Enter' && wordWindow.style.display === 'flex') submitWord()
 })
 document.getElementById('wordClose').onclick = e => {
@@ -1307,26 +1279,6 @@ function finalizePuzzle(state, id) {
     if (finishedpuzzles >= 4) spawnPuzzleKey()
 }
 
-function instantSolvePuzzle(id) {
-    const state = puzzleStates[id]
-    if (state.completed) { closePuzzle(); return }
-    state.snapState = new Array(16).fill(null)
-    state.correct   = 16
-    state.puzzlePieces.forEach(piece => {
-        const index = parseInt(piece.dataset.index)
-        const rect  = miniboard.getBoundingClientRect()
-        const col   = index % 4
-        const row   = Math.floor(index / 4)
-        piece.style.left       = (rect.left + col * CELL) + 'px'
-        piece.style.top        = (rect.top  + row * CELL) + 'px'
-        piece.dataset.locked   = 'true'
-        piece.style.border     = '3px solid lime'
-        state.snapState[index] = piece
-    })
-    updatePreview(id)
-    finalizePuzzle(state, id)
-}
-
 function savePieceData(id) {
     const state = puzzleStates[id]
     state.pieceData = []
@@ -1358,28 +1310,28 @@ function updatePreview(id) {
 }
 
 function darknessZone() {
-    return x < 2600 && x+50 > 0 && y < 4400 && y+50 > 2000
+    return x < 2600 && x+32 > 0 && y < 4400 && y+32 > 2000
 }
 function colliding(item) {
-    return x < item.x+80 && x+80 > item.x && y < item.y+80 && y+80 > item.y
+    return x < item.x+32 && x+32 > item.x && y < item.y+32 && y+32 > item.y
 }
 function locked(nx, ny) {
     return doors.some(dor => {
         if (dor.unlocked) return false
         const w = dor.type === 'purpledoor' ? 90 : 80
-        return nx < dor.x+w && nx+75 > dor.x && ny < dor.y+80 && ny+75 > dor.y
+        return nx < dor.x+w && nx+32 > dor.x && ny < dor.y+80 && ny+32 > dor.y
     })
 }
 function blocked(nx, ny) {
     for (const w of walls) {
-        if (nx < w.x+w.w && nx+75 > w.x && ny < w.y+w.h && ny+75 > w.y) return true
+        if (nx < w.x+w.w && nx+32 > w.x && ny < w.y+w.h && ny+32 > w.y) return true
     }
     return false
 }
 function contact(dor) {
     const w = dor.type === 'purpledoor' ? 90 : 80
     const REACH = 80
-    return x+75 > dor.x-REACH && x < dor.x+w+REACH && y+75 > dor.y-REACH && y < dor.y+80+REACH
+    return x+32 > dor.x-REACH && x < dor.x+w+REACH && y+32 > dor.y-REACH && y < dor.y+80+REACH
 }
 function adinventory(type) {
     if (!inventory[type]) { inventory[type] = 0; slotss[type] = [] }
@@ -1431,14 +1383,6 @@ function baaar() {
     if (progress < 100) { setTimeout(baaar, 1000) } else { gameOver() }
 }
 
-function forceend() {
-    startTime = Date.now() - (totalTime - 3000)
-    counter.style.color = 'red'
-    progressbar.style.background = 'linear-gradient(90deg,#ff003c,#ff0000)'
-    baaar()
-}
-
-// ── PLAYER DIRECTION ──
 function updatePlayerDirection() {
     if      (keys['ArrowUp']    || keys['w']) playerImg.src = 'Images/back.png'
     else if (keys['ArrowDown']  || keys['s']) playerImg.src = 'Images/me.png'
@@ -1446,12 +1390,11 @@ function updatePlayerDirection() {
     else if (keys['ArrowRight'] || keys['d']) playerImg.src = 'Images/right.png'
 }
 
-// ── MAIN LOOP ──
 const MapX = 6000, MapY = 8000
 screen.style.width  = MapX + 'px'
 screen.style.height = MapY + 'px'
-const maxX = MapX - 75
-const maxY = MapY - 75
+const maxX = MapX - 32
+const maxY = MapY - 32
 
 function move() {
     if (!running) { requestAnimationFrame(move); return }
@@ -1470,18 +1413,13 @@ function move() {
 
     const wantsToMove = (nx !== x || ny !== y)
     if (stunned) {
-        // frozen
-    } else if (inLightZone() && gameLight === 'red' && wantsToMove && !noclip) {
+    } else if (inLightZone() && gameLight === 'red' && wantsToMove) {
         triggerFail()
     } else {
-        if (noclip) { x = nx; y = ny }
-        else {
-            if (!locked(nx, y) && !blocked(nx, y)) x = nx
-            if (!locked(x, ny) && !blocked(x, ny)) y = ny
-        }
+        if (!locked(nx, y) && !blocked(nx, y)) x = nx
+        if (!locked(x, ny) && !blocked(x, ny)) y = ny
     }
 
-    // ── UPDATE PLAYER DIRECTION IMAGE ──
     updatePlayerDirection()
 
     checkWordPuzzleProximity()
@@ -1611,21 +1549,14 @@ function move() {
         doorPromptEl.style.display = 'none'
     }
 
-    if (debug) {
-        let dbg = document.getElementById('debugBox')
-        if (!dbg) {
-            dbg = document.createElement('div')
-            dbg.id = 'debugBox'
-            dbg.style.cssText = 'margin-top:10px;color:lime;font-size:12px;'
-            document.getElementById('ui').appendChild(dbg)
-        }
-        dbg.textContent = `noclip:${noclip} | light:${gameLight} | inZone:${inLightZone()} | puzzles:${finishedpuzzles}/4 | x:${Math.round(x)} y:${Math.round(y)}`
-    }
-
     requestAnimationFrame(move)
 }
 
 function startGame() {
+    player.style.width = '32px'
+    player.style.height = '32px'
+    player.querySelector('img').style.width = '32px'
+    player.querySelector('img').style.height = '32px'
     startScreen.classList.add('hidden')
     running   = true
     startTime = Date.now()
