@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<div id="winScreen" style="
+    position:fixed;inset:0;z-index:9999;
+    display:none;flex-direction:column;
+    align-items:center;justify-content:center;gap:32px;
+    background:radial-gradient(ellipse at 50% 30%,#001a0e 0%,#03080f 70%);
+">
+    <div style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:48px;
+        letter-spacing:6px;color:lime;text-align:center;
+        text-shadow:0 0 20px lime,0 0 60px lime;">
+        MISSION COMPLETE
+    </div>
+    <div style="font-size:16px;letter-spacing:3px;color:rgba(0,255,178,0.8);
+        text-align:center;max-width:600px;line-height:2;">
+        You fought through every sector.<br>
+        Solved every puzzle. Outsmarted the ship.<br>
+        And you found her.<br><br>
+        <span style="color:white;font-size:20px;letter-spacing:4px;">Han is safe. 💚</span>
+    </div>
+    <button onclick="location.reload()" style="
+        padding:16px 48px;background:transparent;
+        border:2px solid lime;color:lime;
+        font-family:'Orbitron',sans-serif;font-size:14px;
+        letter-spacing:4px;cursor:pointer;transition:.25s;
+    " onmouseover="this.style.background='lime';this.style.color='black'"
+       onmouseout="this.style.background='transparent';this.style.color='lime'">
+        Play Again
+    </button>
+</div>
+<div id="startScreen">
+    <div class="start-title">
+        Abduction RESCUE<br>OPERATION han
+    </div>
+    <div class="start-sub">
+        Three days ago, Han disappeared. No note. No trace.<br>
+        Just an ever emitting green light in the sky.<br>
+        You've tracked the signal and youve forced your way into their mothership.<br>
+        However, you did it last second and they just took off theres no going back you have to save her<br>
+        Theres Four sectors. Four keycards. One chance. Or else they use her to destroy the world
+    </div>
+    <div class="syringe-warning">
+        You Have 15 Minutes, Make them count
+    </div>
+    <button class="start" id="startBtn"><span>Start</span></button>
+</div>
+
+<div id="endScreen" class="hidden">
+    <div class="end-title">MISSION failed</div>
+    <div class="end-sub">
+        Han was lost to the mothership.<br>
+        The signal vanished into deep space.<br>
+        You ran out of time.
+    </div>
+    <button class="restart-btn" onclick="location.reload()">Restart</button>
+</div>
+
+<div id="fail">YOU MOVED ON RED LIGHT</div>
+
+<div id="board">
+
+    <div id="ui">
+        <div id="inventory"></div>
+        <div id="progressbarContainer">
+            <div id="progressbar"></div>
+            <div id="counter">15:00</div>
+        </div>
+    </div>
+
+    <div id="darkness"></div>
+
+    <div id="screen">
+        
+        <!-- Floor images -->
+        <div class="pic" id="floor"></div>
+        <div class="pic" id="floor2"></div>
+        <div class="pic" id="floor3"></div>
+        <div class="pic" id="floor4"></div>
+        <div class="pic" id="floor5"></div>
+        <div class="pic" id="floor6"></div>
+        <div class="pic" id="floorCorridor"></div>
+        <div id="puzzleKeyMarker"></div>
+        <!-- Zones -->
+        <div id="redZone" class="zone">
+            <div id="corridor" class="zone">Ssssssssssss</div>
+
+        </div>
+
+        <div id="yellowTopZone" class="zone">
+
+        </div>
+
+        <div id="yellowBottomZone" class="zone">
+<!-- WORD PUZZLES -->
+<!-- Word puzzles placed in the ring between square 2 and square 3, top band -->
+<!-- Local y=345 = world y 5145, evenly spread across x 310-2310 -->
+            <div class="wordPuzzle" id="wordPuzzle1" style="left:260px;top:990px;width: 60px; height: 220px;"></div>
+            <div class="wordPuzzle" id="wordPuzzle2" style="left:1150px;top:510px;width: 240px;height: 60px;"></div>
+            <div class="wordPuzzle" id="wordPuzzle3" style="left:1200px;top:1400px;width: 180px;height: 60px;"></div>
+            <div class="wordPuzzle" id="wordPuzzle4" style="left:1550px;top:1010px;width: 60px;height: 160px;"></div>
+        </div>
+
+        <!-- Purple puzzle zone (top-right) -->
+        <div id="purpleZone" class="zone">
+            <div class="puzzle" id="puzzle1">press space</div>
+            <canvas class="preview" id="preview1"></canvas>
+
+            <div class="puzzle" id="puzzle2">press space</div>
+            <canvas class="preview" id="preview2"></canvas>
+
+            <div class="puzzle" id="puzzle3">press space</div>
+            <canvas class="preview" id="preview3"></canvas>
+
+            <div class="puzzle" id="puzzle4">press space</div>
+            <canvas class="preview" id="preview4"></canvas>
+        </div>
+
+        <!-- Purple bottom zone — GREEN/RED LIGHT GAME -->
+        <div id="purplebottomzone" class="zone">
+
+            <!-- Safe lobby -->
+            <div id="lobbyArea">
+                <!-- Group A: top 4 -->
+                <div id="box1" class="box"></div>
+                <div id="box2" class="box"></div>
+                <div id="box3" class="box"></div>
+                <div id="box4" class="box"></div>
+
+                <!-- Group B: bottom 4 -->
+                <div id="box5" class="box"></div>
+                <div id="box6" class="box"></div>
+                <div id="box7" class="box"></div>
+                <div id="box8" class="box"></div>
+
+                <div id="colorKeyItem" class="item" style="display:none;background:magenta;border:3px solid white;color:white;font-size:7px;font-weight:bold;">COLOR KEY</div>
+            </div>
+
+            <!-- Active light-game area -->
+            <div id="lightGameArea">
+                <!-- lightHue at z-index:0, colorItems at z-index:2 — hue stays behind -->
+                <div id="lightHue"></div>
+                <div id="lightswitch">GREEN LIGHT</div>
+
+                <div id="color1" class="coloritem"></div>
+                <div id="color2" class="coloritem"></div>
+                <div id="color3" class="coloritem"></div>
+                <div id="color4" class="coloritem"></div>
+
+                <div id="color5" class="coloritem"></div>
+                <div id="color6" class="coloritem"></div>
+                <div id="color7" class="coloritem"></div>
+                <div id="color8" class="coloritem"></div>
+            </div>
+        </div>
+        <div id="resetPanel">Reset <br>MiniGame</div>
+
+        <!-- Purple light effect -->
+        <div id="lightFx"></div>
+
+        <!-- Pickup items -->
+        <div id="item"     class="item">Key1G</div>
+        <div id="item2"    class="item">Key2B</div>
+        <div id="item3"    class="item">Key3O</div>
+        <div id="item4"    class="item">Key4P</div>
+        <div id="item6"    class="item">testY</div>
+        <div id="item5"    class="item">light</div>
+
+        <!-- Secrets -->
+        <div class="secret" style="left:300px;top:300px">You found Me lil bro</div>
+        <div class="secret" style="left:1200px;top:400px">The trustworthy</div>
+
+        <!-- Doors -->
+        <div id="PurpleDoor" class="door">Closed</div>
+
+<div id="player"><img src="Images\me.png" style="
+    position:absolute;
+    width:95px;
+    height:110px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, -50%);
+    pointer-events:none;
+    image-rendering:pixelated;
+"></div>
+        <div id="comboDoor">ENTER CODE TO OPEN</div>
+        <div id="win"></div>
+    </div><!-- /#screen -->
+
+    <div id="comboMenu">
+        <div id="menuBox">
+            <h3 style="margin-bottom:20px">ENTER 4-PART CODE</h3>
+            <input class="codeBox" maxlength="2" id="c1">
+            <input class="codeBox" maxlength="2" id="c2">
+            <input class="codeBox" maxlength="2" id="c3">
+            <input class="codeBox" maxlength="2" id="c4">
+            <br><br>
+            <button onclick="checkCombo()" style="padding:10px 24px;background:gold;border:none;font-weight:bold;cursor:pointer;margin-right:8px">SUBMIT</button>
+            <button onclick="closeComboMenu()" style="padding:10px 24px;background:#333;border:2px solid white;color:white;cursor:pointer">CANCEL</button>
+            <p id="comboResult"></p>
+        </div>
+    </div>
+
+    <!-- Puzzle overlay -->
+    <div id="prewindow">
+        <div id="prescreen">
+            <button id="close">X</button>
+            <div id="miniboard"></div>
+            <div id="winner"></div>
+        </div>
+    </div>
+
+    <!-- Color mini-inventory -->
+    <div id="colorInventory"></div>
+
+    <!-- Door interaction prompt -->
+    <div id="doorPrompt"></div>
+
+</div>
+
+</body>
+</html>
